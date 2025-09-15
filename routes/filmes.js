@@ -25,4 +25,15 @@ router.post("/", (req, res) => {
   res.status(201).json(novoFilme);
 });
 
+router.get("/", (req, res) => {
+  const filePath = path.join(__dirname, "../data/filmes.json");
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(200).json([]);
+  }
+
+  const filmes = JSON.parse(fs.readFileSync(filePath));
+  res.status(200).json(filmes);
+});
+
 module.exports = router;

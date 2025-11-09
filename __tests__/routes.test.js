@@ -1,7 +1,7 @@
 const request = require('supertest');
-const app = require('../app');
-const sequelize = require('../config/database');
-const Filme = require('../models/Filme');
+const app = require('../app.js');
+const sequelize = require('../config/database.js');
+const Filme = require('../models/Filme.js');
 
 beforeAll(async () => {
   await sequelize.sync({ force: true });

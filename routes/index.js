@@ -1,5 +1,5 @@
 const express = require('express');
-const filmesRouter = require('./filmes');
+const filmesRouter = require('./filmes.js');
 
 const router = express.Router();
 

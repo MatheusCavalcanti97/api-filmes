@@ -1,4 +1,4 @@
-const Filme = require('../models/Filme');
+const Filme = require('../models/Filme.js');
 
 describe('Model Filme', () => {
   beforeEach(() => {

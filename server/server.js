@@ -1,4 +1,6 @@
+
 require('dotenv').config({ debug: false });
+
 const app = require('../app');
 const sequelize = require('../config/database.js');
 
@@ -8,7 +10,6 @@ async function iniciarServidor({ debug = true, startServer = true } = {}) {
   try {
     await sequelize.sync();
     if (debug) console.log('Banco sincronizado com sucesso');
-
     const tables = await sequelize.getQueryInterface().showAllTables();
     const filmesTableExists = tables.includes('filmes');
 
@@ -22,14 +23,18 @@ async function iniciarServidor({ debug = true, startServer = true } = {}) {
 
     if (startServer) {
       const server = app.listen(PORT, () => {
-        if (debug) console.log(`Servidor rodando em http://localhost:${PORT}/api/filmes`);
+        if (debug) {
+          console.log(`Servidor rodando em http://localhost:${PORT}/api/filmes`);
+        }
       });
       return server;
     }
 
     return null;
   } catch (err) {
-    if (debug) console.error('Erro ao conectar ao banco de dados:', err.message);
+    if (debug) {
+      console.error('Erro ao conectar ao banco de dados:', err.message);
+    }
     throw err;
   }
 }

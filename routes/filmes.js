@@ -5,14 +5,21 @@ const Filme = require("../models/Filme.js");
 router.post("/", async (req, res) => {
   const { titulo, ano } = req.body;
 
-  if (!titulo || !ano) {
+  const anoConvertido = Number(ano);
+  if (
+    typeof titulo !== "string" ||
+    titulo.trim() === "" ||
+    !Number.isInteger(anoConvertido) ||
+    anoConvertido < 1888 ||
+    anoConvertido > new Date().getFullYear()
+  ) {
     return res
       .status(400)
-      .json({ erro: "Campos obrigatórios: titulo, ano" });
+      .json({ erro: "Campos obrigatórios: titulo (string), ano (número válido)" });
   }
 
   try {
-    const novoFilme = await Filme.create({ titulo, ano });
+    const novoFilme = await Filme.create({ titulo, ano: anoConvertido });
     res.status(201).json(novoFilme);
   } catch (error) {
     if (error.name === "SequelizeUniqueConstraintError") {
@@ -33,6 +40,10 @@ router.get("/", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
+
+  if (!/^\d+$/.test(id)) {
+    return res.status(400).json({ erro: "ID inválido" });
+  }
 
   try {
     const filme = await Filme.findByPk(id);

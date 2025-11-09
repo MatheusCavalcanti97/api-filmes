@@ -1,29 +1,41 @@
-require('dotenv').config();
+require('dotenv').config({ debug: false });
 const app = require('../app');
-const sequelize = require('../config/database');
-const Filme = require('../models/Filme.js');
+const sequelize = require('../config/database.js');
 
 const PORT = process.env.PORT || 3000;
 
-if (require.main === module) {
-  sequelize.sync().then(async () => {
-    console.log('Banco sincronizado com sucesso');
+async function iniciarServidor({ debug = true, startServer = true } = {}) {
+  try {
+    await sequelize.sync();
+    if (debug) console.log('Banco sincronizado com sucesso');
 
     const tables = await sequelize.getQueryInterface().showAllTables();
-    if (tables.includes('filmes')) {
-      console.log('Tabela "filmes" criada e pronta para uso');
-    } else {
-      console.error('Tabela "filmes" não foi criada');
-      process.exit(1);
+    const filmesTableExists = tables.includes('filmes');
+
+    if (!filmesTableExists) {
+      const errMsg = 'Tabela "filmes" não foi criada';
+      if (debug) console.error(errMsg);
+      throw new Error(errMsg);
     }
 
-    app.listen(PORT, () => {
-      console.log(`Servidor rodando em http://localhost:${PORT}/api/filmes`);
-    });
-  }).catch((err) => {
-    console.error('Erro ao conectar ao banco de dados:', err);
-    process.exit(1);
-  });
+    if (debug) console.log('Tabela "filmes" criada e pronta para uso');
+
+    if (startServer) {
+      const server = app.listen(PORT, () => {
+        if (debug) console.log(`Servidor rodando em http://localhost:${PORT}/api/filmes`);
+      });
+      return server;
+    }
+
+    return null;
+  } catch (err) {
+    if (debug) console.error('Erro ao conectar ao banco de dados:', err.message);
+    throw err;
+  }
 }
 
-module.exports = app;
+if (require.main === module) {
+  iniciarServidor().catch(() => process.exit(1));
+}
+
+module.exports = { app, iniciarServidor };

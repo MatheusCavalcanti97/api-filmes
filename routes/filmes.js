@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Filme = require("../models/Filme");
+const Filme = require("../models/Filme.js");
 
 router.post("/", async (req, res) => {
   const { titulo, ano } = req.body;

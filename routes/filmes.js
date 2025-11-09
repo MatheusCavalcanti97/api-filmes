@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Filme = require("../models/Filme");
 
-// POST /api/filmes
 router.post("/", async (req, res) => {
   const { titulo, ano } = req.body;
 
@@ -23,7 +22,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-// GET /api/filmes
 router.get("/", async (req, res) => {
   try {
     const filmes = await Filme.findAll();

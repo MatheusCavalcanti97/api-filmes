@@ -3,11 +3,13 @@ require('dotenv').config({ path: '.env' });
 
 const requiredEnv = ['DB_NAME', 'DB_USER', 'DB_PASSWORD', 'DB_HOST', 'DB_PORT'];
 
-requiredEnv.forEach((key) => {
-  if (!process.env[key]) {
-    throw new Error(`Variável de ambiente ${key} não está definida`);
-  }
-});
+if (process.env.NODE_ENV !== 'ci') {
+  requiredEnv.forEach((key) => {
+    if (!process.env[key]) {
+      throw new Error(`Variável de ambiente ${key} não está definida`);
+    }
+  });
+}
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,

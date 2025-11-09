@@ -34,6 +34,14 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Cache Node.js modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Wait for PostgreSQL to be ready
         run: |
           echo "Aguardando PostgreSQL..."
@@ -43,14 +51,24 @@ jobs:
           done
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Run tests
+      - name: Copiar .env.test
+        run: cp .env.test .env
+
+      - name: Run tests with coverage
         env:
+          NODE_ENV: test
           DB_NAME: filmes
           DB_USER: postgres
           DB_PASSWORD: postgres
           DB_HOST: localhost
           DB_PORT: 5432
-          NODE_ENV: ci
-        run: npm test
+        run: npm test -- --coverage
+
+      - name: Upload coverage report
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/

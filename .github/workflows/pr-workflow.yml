@@ -1,11 +1,28 @@
 name: Pull Request Workflow
+
 on:
   pull_request:
     branches:
       - integracao
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: filmes
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
 
     steps:
       - name: Checkout repository
@@ -16,8 +33,23 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          echo "Aguardando PostgreSQL..."
+          for i in {1..30}; do
+            pg_isready -h localhost -p 5432 -U postgres && break
+            sleep 1
+          done
+
       - name: Install dependencies
         run: npm install
 
       - name: Run tests
+        env:
+          DB_NAME: filmes
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_HOST: localhost
+          DB_PORT: 5432
+          NODE_ENV: ci
         run: npm test

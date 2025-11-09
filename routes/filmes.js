@@ -1,39 +1,36 @@
 const express = require("express");
-const fs = require("fs");
-const path = require("path");
-
 const router = express.Router();
-const filePath = path.join(__dirname, "../data/filmes.json");
+const Filme = require("../models/Filme");
 
-router.post("/", (req, res) => {
-  const novoFilme = req.body;
+// POST /api/filmes
+router.post("/", async (req, res) => {
+  const { titulo, ano } = req.body;
 
-  if (!novoFilme.id || !novoFilme.titulo || !novoFilme.ano) {
+  if (!titulo || !ano) {
     return res
       .status(400)
-      .json({ erro: "Campos obrigatórios: id, titulo, ano" });
+      .json({ erro: "Campos obrigatórios: titulo, ano" });
   }
 
-  if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, JSON.stringify([]));
+  try {
+    const novoFilme = await Filme.create({ titulo, ano });
+    res.status(201).json(novoFilme);
+  } catch (error) {
+    if (error.name === "SequelizeUniqueConstraintError") {
+      return res.status(409).json({ erro: "Título já existe" });
+    }
+    res.status(500).json({ erro: "Erro ao salvar filme" });
   }
-
-  const filmes = JSON.parse(fs.readFileSync(filePath));
-  filmes.push(novoFilme);
-  fs.writeFileSync(filePath, JSON.stringify(filmes, null, 2));
-
-  res.status(201).json(novoFilme);
 });
 
-router.get("/", (req, res) => {
-  const filePath = path.join(__dirname, "../data/filmes.json");
-
-  if (!fs.existsSync(filePath)) {
-    return res.status(200).json([]);
+// GET /api/filmes
+router.get("/", async (req, res) => {
+  try {
+    const filmes = await Filme.findAll();
+    res.status(200).json(filmes);
+  } catch (error) {
+    res.status(500).json({ erro: "Erro ao buscar filmes" });
   }
-
-  const filmes = JSON.parse(fs.readFileSync(filePath));
-  res.status(200).json(filmes);
 });
 
 module.exports = router;

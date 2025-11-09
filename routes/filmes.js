@@ -31,4 +31,21 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const filme = await Filme.findByPk(id);
+
+    if (!filme) {
+      return res.status(404).json({ erro: "Filme não encontrado" });
+    }
+
+    await filme.destroy();
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ erro: "Erro ao remover filme" });
+  }
+});
+
 module.exports = router;

@@ -2,8 +2,8 @@ describe('Configuração do Sequelize', () => {
   const ORIGINAL_ENV = process.env;
 
   beforeEach(() => {
-    jest.resetModules(); 
-    process.env = { ...ORIGINAL_ENV }; 
+    jest.resetModules();
+    process.env = { ...ORIGINAL_ENV };
   });
 
   afterAll(() => {

@@ -1,8 +1,12 @@
-name: Pull Request Workflow
+name: Docker API Workflow
 
 on:
+  push:
+    branches:
+      - feat/docker-api-integration
   pull_request:
     branches:
+      - main
       - integracao
 
 jobs:
@@ -23,6 +27,13 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
+
+    env:
+      DB_NAME: filmes
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_HOST: localhost
+      DB_PORT: 5432
 
     steps:
       - name: Checkout repository
@@ -51,5 +62,4 @@ jobs:
           DB_PASSWORD: postgres
           DB_HOST: localhost
           DB_PORT: 5432
-          NODE_ENV: ci
         run: npm test

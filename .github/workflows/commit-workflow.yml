@@ -2,14 +2,9 @@ name: Commit Workflow
 
 on:
   push:
-    branches:
-      - test/**
-      - feat/**
-      - fix/**
-      - feature/**
-      - hotfix/**
-      - chore/**
-      - refactor/**
+    branches-ignore:
+      - main
+      - integracao
 
 jobs:
   build-and-test:
@@ -47,20 +42,18 @@ jobs:
             sleep 1
           done
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Create .env.test file
+      - name: Create .env.test dynamically
         run: |
           echo "DB_NAME=filmes" >> .env.test
           echo "DB_USER=postgres" >> .env.test
           echo "DB_PASSWORD=postgres" >> .env.test
           echo "DB_HOST=localhost" >> .env.test
           echo "DB_PORT=5432" >> .env.test
-          echo "NODE_ENV=ci" >> .env.test
+          echo "NODE_ENV=test" >> .env.test
+          echo ".env.test criado com sucesso."
 
-      - name: Copy .env.test to .env
-        run: cp .env.test .env
+      - name: Install dependencies
+        run: npm install
 
       - name: Run tests
         env:

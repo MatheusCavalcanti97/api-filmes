@@ -1,7 +1,7 @@
 require('dotenv').config({ path: '.env.test' });
 
 module.exports = {
-  testEnvironment: "node",
+  testEnvironment: 'node',
   collectCoverage: true,
   coverageThreshold: {
     global: {

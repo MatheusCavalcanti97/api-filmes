@@ -9,17 +9,17 @@ const PORT = process.env.PORT || 3000;
 async function iniciarServidor({ debug = true, startServer = true } = {}) {
   try {
     await sequelize.sync();
-    if (debug) console.log('Banco sincronizado com sucesso');
+    if (debug) {console.log('Banco sincronizado com sucesso');}
     const tables = await sequelize.getQueryInterface().showAllTables();
     const filmesTableExists = tables.includes('filmes');
 
     if (!filmesTableExists) {
       const errMsg = 'Tabela "filmes" não foi criada';
-      if (debug) console.error(errMsg);
+      if (debug) {console.error(errMsg);}
       throw new Error(errMsg);
     }
 
-    if (debug) console.log('Tabela "filmes" criada e pronta para uso');
+    if (debug) {console.log('Tabela "filmes" criada e pronta para uso');}
 
     if (startServer) {
       const server = app.listen(PORT, () => {

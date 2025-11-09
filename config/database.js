@@ -38,7 +38,7 @@ const sequelize = new Sequelize(
     port: parseInt(process.env.DB_PORT, 10),
     dialect: 'postgres',
     logging: false,
-  }
+  },
 );
 
 module.exports = sequelize;

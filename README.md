@@ -4,6 +4,18 @@ Este projeto consiste em uma API REST desenvolvida com **Node.js** e **Express**
 A API foi construída com foco em simplicidade, organização, testes automatizados e boas práticas de versionamento com Git.
 
 ---
+## Badges
+
+![Docker Release Workflow](https://github.com/mattheusliimma97/filmes-api/actions/workflows/docker-release-workflow.yml/badge.svg)
+[![Docker Pulls](https://badgen.net/docker/pulls/mattheusliimma97/filmes-api?color=blue&style=flat-square)](https://hub.docker.com/repository/docker/mattheusliimma97/filmes-api/general)
+[![Docker Version](https://badgen.net/docker/v/mattheusliimma97/filmes-api?color=orange&style=flat-square)](https://hub.docker.com/repository/docker/mattheusliimma97/filmes-api/general)
+
+> ⚠️ Observação: os badges do DockerHub só refletirão dados corretos após a primeira publicação da imagem.  
+> 🟦 Azul: número de downloads (pulls).
+> 🟧 Laranja: versão mais recente da imagem.
+> ✅ Workflow do GitHub: indica se o workflow de publicação passou.
+
+---
 
 ## Estrutura do Projeto
 

@@ -5,7 +5,7 @@ A API foi construída com foco em simplicidade, organização, testes automatiza
 
 ---
 ## Badges
-
+---
 ### CI/CD – Workflow do Docker
 [![Docker Release Workflow](https://github.com/MatheusCavalcanti97/api-filmes/actions/workflows/docker-release-workflow.yml/badge.svg)](https://github.com/MatheusCavalcanti97/api-filmes/actions/workflows/docker-release-workflow.yml)
 
@@ -18,7 +18,6 @@ A API foi construída com foco em simplicidade, organização, testes automatiza
 
 ### Imagem no DockerHub  
  **Acesse aqui:** https://hub.docker.com/r/mattheusliimma97/filmes-api
-
 ---
 
 ## Estrutura do Projeto

@@ -5,16 +5,19 @@ A API foi construída com foco em simplicidade, organização, testes automatiza
 
 ---
 ## Badges
+---
+### CI/CD – Workflow do Docker
+[![Docker Release Workflow](https://github.com/MatheusCavalcanti97/api-filmes/actions/workflows/docker-release-workflow.yml/badge.svg)](https://github.com/MatheusCavalcanti97/api-filmes/actions/workflows/docker-release-workflow.yml)
 
-![Docker Release Workflow](https://github.com/mattheusliimma97/filmes-api/actions/workflows/docker-release-workflow.yml/badge.svg)
-[![Docker Pulls](https://badgen.net/docker/pulls/mattheusliimma97/filmes-api?color=blue&style=flat-square)](https://hub.docker.com/repository/docker/mattheusliimma97/filmes-api/general)
-[![Docker Version](https://badgen.net/docker/v/mattheusliimma97/filmes-api?color=orange&style=flat-square)](https://hub.docker.com/repository/docker/mattheusliimma97/filmes-api/general)
+### Docker Hub – Informações da Imagem
+![Docker Pulls](https://img.shields.io/docker/pulls/mattheusliimma97/filmes-api)
+![Docker Image Size](https://img.shields.io/docker/image-size/mattheusliimma97/filmes-api/latest)
+![Docker Version](https://img.shields.io/docker/v/mattheusliimma97/filmes-api?sort=semver)
 
-> ⚠️ Observação: os badges do DockerHub só refletirão dados corretos após a primeira publicação da imagem.  
-> 🟦 Azul: número de downloads (pulls).
-> 🟧 Laranja: versão mais recente da imagem.
-> ✅ Workflow do GitHub: indica se o workflow de publicação passou.
+---
 
+### Imagem no DockerHub  
+ **Acesse aqui:** https://hub.docker.com/r/mattheusliimma97/filmes-api
 ---
 
 ## Estrutura do Projeto
@@ -45,7 +48,7 @@ api-filmes/
 
 ---
 
-## 🚀 Como executar a API
+## Como executar a API
 
 ### 1. Localmente (sem Docker)
 
@@ -108,15 +111,14 @@ npm start
 Você pode testar os endpoints usando o **Postman**, **Insomnia** ou **curl**:
 
 ```bash
-# Listar filmes
+
 curl http://localhost:3000/api/filmes
 
-# Cadastrar filme
+
 curl -X POST http://localhost:3000/api/filmes \
   -H "Content-Type: application/json" \
   -d '{"titulo": "O Senhor dos Anéis", "ano": 2001}'
 
-# Deletar um filme pelo id
 curl -X DELETE http://localhost:3000/api/filmes/2
 ```
 
@@ -185,19 +187,14 @@ docker exec -it api-filmes-db psql -U usuario -d filmesdb
 Dentro do console `psql`, exemplos de consultas SQL:
 
 ```sql
--- Listar todas as tabelas
 \dt
 
--- Listar todos os filmes
 SELECT * FROM filmes;
 
--- Inserir um filme
 INSERT INTO filmes (titulo, ano) VALUES ('Interestelar', 2014);
 
--- Atualizar um filme
 UPDATE filmes SET titulo='Matrix Reloaded' WHERE id=1;
 
--- Deletar um filme
 DELETE FROM filmes WHERE id=2;
 ```
 

@@ -4,59 +4,65 @@ Este projeto consiste em uma API REST desenvolvida com **Node.js** e **Express**
 A API foi construída com foco em simplicidade, organização, testes automatizados e boas práticas de versionamento com Git.
 
 ---
-## Badges
----
-### CI/CD – Workflow do Docker
+# Badges
+
 [![Docker Release Workflow](https://github.com/MatheusCavalcanti97/api-filmes/actions/workflows/docker-release-workflow.yml/badge.svg)](https://github.com/MatheusCavalcanti97/api-filmes/actions/workflows/docker-release-workflow.yml)
 
-### Docker Hub – Informações da Imagem
 ![Docker Pulls](https://img.shields.io/docker/pulls/mattheusliimma97/filmes-api)
 ![Docker Image Size](https://img.shields.io/docker/image-size/mattheusliimma97/filmes-api/latest)
 ![Docker Version](https://img.shields.io/docker/v/mattheusliimma97/filmes-api?sort=semver)
 
----
 
-### Imagem no DockerHub  
- **Acesse aqui:** https://hub.docker.com/r/mattheusliimma97/filmes-api
+> Acesse aqui: https://hub.docker.com/r/mattheusliimma97/filmes-api
+
 ---
 
 ## Estrutura do Projeto
 
 ```
-api-filmes/
-│── app.js               # Configuração principal do Express.
-│── package.json         # Dependências e scripts.
-│── README.md            # Documentação.
-│
-├── server/              # Inicialização do servidor.
+├── __tests__/
+│   └── database.test.js
+│   └── filme.test.js
+│   └── routes.test.js       
+├── .github/             
+│   └── workflows
+│       └── commit-workflow.yml
+│       └── docker-api-workflow.yml
+│       └── docker-release-workflow.yml
+│       └── lint-workflow.yml
+│       └── pr-workflow.yml
+├── config/
+│   └── database.js     
+├── coverage/          
+├── models/
+│   └── filme.js
+├── node_modules/           
+├── routes/            
+│   └── filmes.js
+│   └── index.js
+├── server/             
 │   └── server.js
-│
-├── routes/              # Definição das rotas da API.
-│
-├── models/              # Modelos do banco de dados.
-│
-├── config/              # Configurações de banco, dotenv etc.
-│
-├── __tests__/           # Testes automatizados com Jest + Supertest.
-│
-├── Dockerfile           # Configuração do container da API.
-├── docker-compose.yml   # Orquestração da API e banco de dados.
-│
-├── eslint.config.cjs    # Configuração do ESLint
-└── node_modules/
+│── .env
+│── .env.test
+│── .gitignore
+│── app.js
+├── docker-compose.yml
+├── Dockerfile
+├── eslint.config.cjs
+├── jest.config.js
+│── package-lock.json      
+│── package.json                             
+└── README.md
 ```
 
----
+# Como executar a API
+#### 1. Localmente (sem Docker):
 
-## Como executar a API
-
-### 1. Localmente (sem Docker)
-
-#### Passo 1 — Variáveis de ambiente
+> Passo 1 — Variáveis de ambiente
 
 Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
 
-```env
+```
 PORT=3000
 DB_HOST=localhost
 DB_PORT=5432
@@ -64,12 +70,12 @@ DB_USER=usuario
 DB_PASSWORD=senha123
 DB_NAME=filmesdb
 ```
-
+---
 #### Passo 2 — Variáveis de ambiente para testes
 
 Crie também um arquivo `.env.test` com o seguinte conteúdo:
 
-```env
+```
 DB_NAME=filmes_db
 DB_USER=filmes_user
 DB_PASSWORD=filmes_pass123
@@ -82,7 +88,7 @@ NODE_ENV=test
 
 #### Passo 3 — Instale as dependências
 
-```bash
+```
 npm install
 ```
 
@@ -90,19 +96,19 @@ npm install
 
 O projeto utiliza **ESLint** para manter o código padronizado:
 
-```bash
+```
 npx eslint .
 ```
 
 > Para corrigir problemas automaticamente:
 
-```bash
+```
 npx eslint . --fix
 ```
 
 #### Passo 5 — Inicie o servidor
 
-```bash
+```
 npm start
 ```
 
@@ -110,7 +116,7 @@ npm start
 
 Você pode testar os endpoints usando o **Postman**, **Insomnia** ou **curl**:
 
-```bash
+```
 
 curl http://localhost:3000/api/filmes
 
@@ -124,26 +130,22 @@ curl -X DELETE http://localhost:3000/api/filmes/2
 
 #### Passo 7 — Execute os testes
 
-```bash
+```
 npm test
 ```
-
 > O Jest vai utilizar o arquivo `.env.test` automaticamente se configurado com `NODE_ENV=test`.
-
 ---
 
-### 2. Com Docker
-
+#### 2. Com Docker
 #### Pré-requisitos
 
 * [Docker](https://docs.docker.com/get-docker/)
 * [Docker Compose](https://docs.docker.com/compose/install/)
 
 #### Variáveis de ambiente
+> Crie um arquivo `.env` na raiz do projeto (mesmo conteúdo da execução local):
 
-Crie um arquivo `.env` na raiz do projeto (mesmo conteúdo da execução local):
-
-```env
+```
 PORT=3000
 DB_HOST=db
 DB_PORT=5432
@@ -153,41 +155,39 @@ DB_NAME=filmesdb
 ```
 
 #### Comandos Docker
+> Build e start da aplicação:
 
-* Build e start da aplicação:
-
-```bash
+```
 docker-compose up --build
 ```
 
 * Start em background:
 
-```bash
+```
 docker-compose up -d
 ```
 
 * Parar containers:
 
-```bash
+```
 docker-compose down
 ```
 
 * Ver logs da aplicação:
 
-```bash
+```
 docker-compose logs -f api
 ```
 
 #### Acessando o banco de dados
 
-```bash
+```
 docker exec -it api-filmes-db psql -U usuario -d filmesdb
 ```
 
 Dentro do console `psql`, exemplos de consultas SQL:
 
-```sql
-\dt
+```
 
 SELECT * FROM filmes;
 
@@ -200,11 +200,11 @@ DELETE FROM filmes WHERE id=2;
 
 ---
 
-## Endpoints disponíveis
+# Endpoints disponíveis
 
-### ➤ GET — Listar filmes
+### GET — Listar filmes
 
-**GET [http://localhost:3000/api/filmes](http://localhost:3000/api/filmes)**
+> GET [http://localhost:3000/api/filmes](http://localhost:3000/api/filmes)**
 
 Resposta esperada:
 
@@ -218,9 +218,9 @@ Resposta esperada:
 ]
 ```
 
-### ➤ POST — Cadastrar filme
+### POST — Cadastrar filme
 
-**POST [http://localhost:3000/api/filmes](http://localhost:3000/api/filmes)**
+> POST [http://localhost:3000/api/filmes](http://localhost:3000/api/filmes)**
 
 Corpo da requisição (JSON):
 
@@ -230,10 +230,9 @@ Corpo da requisição (JSON):
   "ano": 2001
 }
 ```
+### DELETE - Remover filme
 
-### ➤ DELETE — Remover filme
-
-**DELETE [http://localhost:3000/api/filmes/:id](http://localhost:3000/api/filmes/:id)**
+> DELETE [http://localhost:3000/api/filmes/:id](http://localhost:3000/api/filmes/:id)**
 
 Exemplo de requisição:
 
@@ -265,15 +264,19 @@ it('GET /api/filmes deve retornar status 200', async () => {
 
 ---
 
-## Workflow Git
+# Workflow Git
 
 O projeto utiliza o **GitHub Flow**, que organiza o desenvolvimento em branches de funcionalidades e promove integração contínua com validação automatizada via **GitHub Actions**.
 
-### Motivo da escolha
+---
+
+#### Motivo da escolha
 
 O GitHub Flow é simples e direto, ideal para projetos individuais ou pequenos times. Permite que cada feature seja desenvolvida em uma branch isolada e integrada à `main` de forma segura.
 
-### Estrutura de Branches
+---
+
+#### Estrutura de Branches
 
 1. Estrutura inicial do projeto e README.md
 2. Desenvolvimento da rota **POST**

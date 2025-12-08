@@ -1,19 +1,100 @@
-- name: Configurar aplicação Node.js
+- name: Configurar aplicação Node.js com Docker
   hosts: app
   become: yes
+  vars:
+    ansible_remote_tmp: /var/tmp/ansible
+
   tasks:
-    - name: Atualizar pacotes
+    #####################################################################
+    # 1. LIMPEZA DE REPOSITÓRIOS ANTIGOS DO DOCKER
+    #####################################################################
+    - name: Remover repositório Docker antigo
+      file:
+        path: /etc/apt/sources.list.d/docker.list
+        state: absent
+
+    - name: Remover chave GPG antiga do Docker (se existir)
+      file:
+        path: /etc/apt/keyrings/docker.gpg
+        state: absent
+
+    #####################################################################
+    # 2. UPDATE INICIAL
+    #####################################################################
+    - name: Atualizar pacotes base
       apt:
         update_cache: yes
 
-    - name: Instalar Node.js, npm e git
+    #####################################################################
+    # 3. DEPENDÊNCIAS DO DOCKER
+    #####################################################################
+    - name: Instalar dependências do Docker
       apt:
-        name: "{{ item }}"
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
         state: present
-      loop:
-        - nodejs
-        - npm
-        - git
+
+    #####################################################################
+    # 4. ADICIONAR CHAVE GPG
+    #####################################################################
+    - name: Criar diretório para keyrings
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+
+    - name: Baixar e converter chave GPG do Docker
+      shell: curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+      args:
+        creates: /etc/apt/keyrings/docker.gpg
+
+    #####################################################################
+    # 5. ADICIONAR REPOSITÓRIO DOCKER CORRETO
+    #####################################################################
+    - name: Adicionar repositório oficial do Docker
+      copy:
+        dest: /etc/apt/sources.list.d/docker.list
+        content: |
+          deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian {{ ansible_facts['distribution_release'] }} stable
+
+    #####################################################################
+    # 6. UPDATE APÓS ADICIONAR REPO
+    #####################################################################
+    - name: Atualizar pacotes após adicionar repo do Docker
+      apt:
+        update_cache: yes
+
+    #####################################################################
+    # 7. INSTALAR DOCKER + COMPOSE
+    #####################################################################
+    - name: Instalar Docker Engine e Docker Compose
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+
+    - name: Adicionar usuário vagrant ao grupo docker
+      user:
+        name: vagrant
+        groups: docker
+        append: yes
+
+    #####################################################################
+    # 8. CLONAR O REPOSITÓRIO NA VM
+    #####################################################################
+    - name: Criar pasta da aplicação
+      file:
+        path: /home/vagrant/api-filmes
+        state: directory
+        owner: vagrant
+        group: vagrant
 
     - name: Clonar repositório da aplicação
       git:
@@ -21,35 +102,43 @@
         dest: /home/vagrant/api-filmes
         version: feat/ansible
         force: yes
+        update: yes
 
-    - name: Instalar dependências da aplicação
-      command: npm install
-      args:
-        chdir: /home/vagrant/api-filmes
-
+    #####################################################################
+    # 9. CRIAR .env E .env.TEST DENTRO DA VM
+    #####################################################################
     - name: Criar arquivo .env
       copy:
         dest: /home/vagrant/api-filmes/.env
+        owner: vagrant
+        group: vagrant
+        mode: "0644"
         content: |
           PORT=3000
-          DB_HOST=localhost
+          DB_HOST=db
           DB_PORT=5432
-          DB_USER=usuario
-          DB_PASSWORD=senha123
-          DB_NAME=filmesdb
+          DB_USER=filmes_user
+          DB_PASSWORD=filmes_pass123
+          DB_NAME=filmes_db
 
     - name: Criar arquivo .env.test
       copy:
         dest: /home/vagrant/api-filmes/.env.test
+        owner: vagrant
+        group: vagrant
+        mode: "0644"
         content: |
+          DB_HOST=db
+          DB_PORT=5432
           DB_NAME=filmes_db
           DB_USER=filmes_user
           DB_PASSWORD=filmes_pass123
-          DB_HOST=localhost
-          DB_PORT=5432
           NODE_ENV=test
 
-    - name: Rodar aplicação
-      command: npm start
+    #####################################################################
+    # 10. SUBIR O DOCKER COMPOSE
+    #####################################################################
+    - name: Subir containers com Docker Compose
+      command: docker compose up -d
       args:
         chdir: /home/vagrant/api-filmes

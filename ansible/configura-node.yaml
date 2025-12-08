@@ -1,0 +1,32 @@
+- name: Configurar aplicação Node.js
+  hosts: app
+  become: yes
+  tasks:
+    - name: Atualizar pacotes
+      apt:
+        update_cache: yes
+
+    - name: Instalar Node.js, npm e git
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - nodejs
+        - npm
+        - git
+
+    - name: Clonar repositório da aplicação
+      git:
+        repo: "https://github.com/MatheusCavalcanti97/api-filmes.git"
+        dest: /home/vagrant/api-filmes
+        version: feat/ansible
+
+    - name: Instalar dependências da aplicação
+      command: npm install
+      args:
+        chdir: /home/vagrant/api-filmes
+
+    - name: Rodar aplicação
+      command: npm start
+      args:
+        chdir: /home/vagrant/api-filmes

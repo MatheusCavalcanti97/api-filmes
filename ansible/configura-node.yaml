@@ -20,11 +20,34 @@
         repo: "https://github.com/MatheusCavalcanti97/api-filmes.git"
         dest: /home/vagrant/api-filmes
         version: feat/ansible
+        force: yes
 
     - name: Instalar dependências da aplicação
       command: npm install
       args:
         chdir: /home/vagrant/api-filmes
+
+    - name: Criar arquivo .env
+      copy:
+        dest: /home/vagrant/api-filmes/.env
+        content: |
+          PORT=3000
+          DB_HOST=localhost
+          DB_PORT=5432
+          DB_USER=usuario
+          DB_PASSWORD=senha123
+          DB_NAME=filmesdb
+
+    - name: Criar arquivo .env.test
+      copy:
+        dest: /home/vagrant/api-filmes/.env.test
+        content: |
+          DB_NAME=filmes_db
+          DB_USER=filmes_user
+          DB_PASSWORD=filmes_pass123
+          DB_HOST=localhost
+          DB_PORT=5432
+          NODE_ENV=test
 
     - name: Rodar aplicação
       command: npm start

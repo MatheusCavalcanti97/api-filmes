@@ -31,6 +31,11 @@ A API foi construída com foco em simplicidade, organização, testes automatiza
 │       └── docker-release-workflow.yml
 │       └── lint-workflow.yml
 │       └── pr-workflow.yml
+├── ansible/
+│   └── imagem_01.jpeg
+│   └── imagem_02.jpeg
+│   └── imagem_03.jpeg
+│   └── imagem_04.jpeg
 ├── config/
 │   └── database.js     
 ├── coverage/          
@@ -264,6 +269,89 @@ it('GET /api/filmes deve retornar status 200', async () => {
 
 ---
 
+# Ansible
+
+> Para realizar a configuração com Ansible, utilizei um ambiente baseado em Debian, criando duas máquinas virtuais com Vagrant e libvirt. Esse setup permitiu simular um ambiente real de provisionamento, onde uma VM atua como control node (executando o Ansible) e a outra como app node (recebendo a aplicação e os serviços via Docker). Observação: Está sendo abstraídas fases de configuração do Vagrant + libvirt, porque esse não é o foco.
+
+1. Configuração do arquivo Vagrantfile:
+```
+Vagrant.configure("2") do |config|
+  # Configuração global do libvirt
+  config.vm.provider :libvirt do |libvirt|
+    libvirt.uri = "qemu:///system"   
+    libvirt.qemu_use_session = false 
+  end
+
+  # VM1: Nó de controle (Ansible)
+  config.vm.define "control" do |control|
+    control.vm.box = "debian/bookworm64"
+    control.vm.hostname = "control"
+    control.vm.network "private_network", ip: "192.168.56.10"
+
+    control.vm.provision "shell", inline: <<-SHELL
+      apt update
+      apt install -y ansible python3 python3-apt git
+    SHELL
+  end
+
+  # VM2: Nó de aplicação (Node.js)
+  config.vm.define "app" do |app|
+    app.vm.box = "debian/bookworm64"
+    app.vm.hostname = "app"
+    app.vm.network "private_network", ip: "192.168.56.11"
+
+    app.vm.provision "shell", inline: <<-SHELL
+      apt update
+      apt install -y python3 python3-apt git curl
+    SHELL
+  end
+end
+```
+
+2. Acesse a pasta onde você criou o arquivo Vagrantfile e execute:
+```
+vagrant up
+```
+
+3. Execute o comando abaixo fora da vm (no seu host) para verificar IPs e chaves:
+```
+vagrant ssh-config
+```
+>  Confirme se os IPs e caminhos das chaves batem com o inventário, neste caso, no arquivo hosts, foram:
+
+```
+[control]
+192.168.56.10 ansible_user=vagrant ansible_ssh_private_key_file=/home/matheus-lima/Documentos/ansible-vms/.vagrant/machines/control/libvirt/private_key
+
+[app]
+192.168.56.11 ansible_user=vagrant ansible_ssh_private_key_file=/home/matheus-lima/Documentos/ansible-vms/.vagrant/machines/app/libvirt/private_key
+```
+
+4. Então testa-se a conexão:
+```
+ansible all -m ping -i hosts
+```
+> Se responder pong, está tudo certo.
+
+5. Então, por fim, dentro da pasta ansible dentro do seu projeto, executa-se:
+```
+ansible-playbook configura-node.yaml -i hosts
+```
+
+6. Imagem da Execução do Arquivo "configura_node.yml":
+> ![Texto alternativo](./assets//imagem_01.jpeg)
+
+
+7. Dentro da VM app, verifica-se que foi configurado o ambiente docker que a aplicação necessita e os containers estão em running:
+> ![Texto alternativo](./assets//imagem_02.jpeg)
+
+
+8. Foi realizada a requisição de curl, ex1:
+> ![Texto alternativo](./assets//imagem_03.jpeg)
+
+9. Foi realizada a requisição de curl, ex1:
+> ![Texto alternativo](./assets//imagem_04.jpeg)
+
 # Workflow Git
 
 O projeto utiliza o **GitHub Flow**, que organiza o desenvolvimento em branches de funcionalidades e promove integração contínua com validação automatizada via **GitHub Actions**.
@@ -278,9 +366,11 @@ O GitHub Flow é simples e direto, ideal para projetos individuais ou pequenos t
 
 #### Estrutura de Branches
 
-1. Estrutura inicial do projeto e README.md
-2. Desenvolvimento da rota **POST**
-3. Desenvolvimento da rota **GET**
-4. Desenvolvimento da rota **DELETE**
-5. Branch intermediária para **testes e workflows**
-6. Versão final e estável do projeto
+1. Estrutura inicial do projeto e README.md.
+2. Desenvolvimento da rota **POST**.
+3. Desenvolvimento da rota **GET**.
+4. Desenvolvimento da rota **DELETE**.
+5. Branch intermediária para **testes e workflows**.
+6. Versão final e estável do projeto.
+7. Publicação construção e publicação da imagem do projeto no DockerHub.
+8. Configuração do Ansible.
